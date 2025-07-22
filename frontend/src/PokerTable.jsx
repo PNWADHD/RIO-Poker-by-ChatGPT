@@ -1,70 +1,57 @@
-
+// frontend/src/PokerTable.jsx
 import React, { useEffect, useState } from 'react';
-import { io } from "socket.io-client";
+import io from 'socket.io-client';
+
+// ✅ Point to your live Render backend
 const socket = io('https://rio-poker-backend.onrender.com');
-export default function PokerTable() {
-  const [players, setPlayers] = useState([]);
-  const [chat, setChat] = useState([]);
-  const [message, setMessage] = useState('');
-  const [board, setBoard] = useState([]);
-  const [round, setRound] = useState('');
-  const [winner, setWinner] = useState(null);
+
+const PokerTable = () => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
 
   useEffect(() => {
-    socket.on('table_state', (state) => {
-      setPlayers(state.players);
-      setBoard(state.board || []);
-      setRound(state.round || '');
-    });
-
     socket.on('chat_message', (msg) => {
-      setChat((prev) => [...prev, msg]);
+      setMessages(prev => [...prev, msg]);
     });
 
-    socket.on('hand_result', (result) => {
-      setWinner(result.winner);
-      setTimeout(() => setWinner(null), 4000);
-    });
-
-    return () => socket.disconnect();
+    return () => {
+      socket.off('chat_message');
+    };
   }, []);
 
   const sendMessage = () => {
-    if (message.trim()) {
-      socket.emit('chat_message', message.trim());
-      setMessage('');
+    if (input.trim()) {
+      socket.emit('chat_message', input);
+      setInput('');
     }
   };
 
   return (
-    <div style={{ fontFamily: 'sans-serif', padding: 20, backgroundColor: '#043b1a', color: 'white', minHeight: '100vh' }}>
-      <img src="/rio-logo.png" alt="RIO Logo" style={{ width: 100, marginBottom: 20 }} />
-      <div style={{ background: `url(/felt-texture.png)`, borderRadius: 16, padding: 20, boxShadow: '0 0 20px black' }}>
-        <h2>Betting Round: {round}</h2>
-        <div style={{ margin: '10px 0' }}>
-          Board: {board.map((card, i) => <span key={i}>{card} </span>)}
-        </div>
-        <div>
-          {players.map((p, i) => (
-            <div key={i} style={{ margin: 5, backgroundColor: '#065f2f', padding: 10, borderRadius: 8 }}>
-              <span style={{ marginRight: 8 }}>{p.avatar}</span>
-              <b>{p.name}</b> – ${p.stack}
-            </div>
-          ))}
-        </div>
-        {winner && <div style={{ marginTop: 10, background: '#FFD700', color: '#000', padding: 10, borderRadius: 8 }}>
-          🏆 Winner: {winner.name}
-        </div>}
+    <div className="p-4">
+      <h1 className="text-xl font-bold mb-4">RIO Poker</h1>
+
+      <div className="border rounded p-2 h-40 overflow-y-scroll mb-2 bg-gray-100">
+        {messages.map((msg, i) => (
+          <div key={i} className="text-sm">{msg}</div>
+        ))}
       </div>
 
-      <div style={{ marginTop: 20 }}>
-        <h3>Chat</h3>
-        <div style={{ maxHeight: 150, overflowY: 'auto', backgroundColor: '#222', padding: 10 }}>
-          {chat.map((msg, i) => <div key={i}>{msg}</div>)}
-        </div>
-        <input value={message} onChange={e => setMessage(e.target.value)} style={{ width: '70%' }} />
-        <button onClick={sendMessage}>Send</button>
+      <div className="flex gap-2">
+        <input
+          className="border rounded px-2 py-1 flex-1"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+        />
+        <button
+          className="bg-blue-500 text-white rounded px-4 py-1"
+          onClick={sendMessage}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default PokerTable;
