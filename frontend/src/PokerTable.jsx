@@ -1,9 +1,8 @@
-// frontend/src/PokerTable.jsx
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-// ✅ Point to your live Render backend
-const socket = io('https://rio-poker-backend.onrender.com');
+// ✅ Correct backend socket URL from Render
+const socket = io('https://rio-poker-by-chatgpt-1.onrender.com');
 
 const PokerTable = () => {
   const [messages, setMessages] = useState([]);
