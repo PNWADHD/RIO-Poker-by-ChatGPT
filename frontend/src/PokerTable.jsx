@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-
+import io from "socket.io-client";
 const socket = io('https://rio-poker-by-chatgpt-1.onrender.com'); // Change to your Render URL in production
 
 export default function PokerTable() {
