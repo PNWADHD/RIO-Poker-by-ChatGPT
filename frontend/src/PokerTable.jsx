@@ -1,8 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import io from "socket.io-client";
-const socket = io('https://rio-poker-by-chatgpt-1.onrender.com'); // Change to your Render URL in production
-
+import { io } from "socket.io-client";
+const socket = io('https://rio-poker-backend.onrender.com');
 export default function PokerTable() {
   const [players, setPlayers] = useState([]);
   const [chat, setChat] = useState([]);
